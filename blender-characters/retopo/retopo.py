@@ -1,7 +1,6 @@
 import bpy, bmesh, sys, subprocess, os, time
 name, faces = sys.argv[1], int(sys.argv[2])
 voxel = float(sys.argv[3]) if len(sys.argv) > 3 else 0.004
-import os
 S = os.environ.get("RETOPO_DIR", "retopo_work")
 IM = os.environ.get("INSTANT_MESHES", "Instant Meshes")
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -9,7 +8,12 @@ with bpy.data.libraries.load(f"{S}/{name}_sculpt.blend") as (src, dst):
     dst.objects = src.objects
 hi = dst.objects[0]; bpy.context.scene.collection.objects.link(hi)
 v = hi.copy(); v.data = hi.data.copy(); bpy.context.scene.collection.objects.link(v)
-m = v.modifiers.new("v", "REMESH"); m.mode = "VOXEL"; m.voxel_size = voxel
+m = v.modifiers.new("v", "REMESH")
+if os.environ.get("REMESH_MODE", "VOXEL") == "VOXEL":
+    m.mode = "VOXEL"; m.voxel_size = voxel
+else:
+    m.mode = "SMOOTH"; m.octree_depth = int(os.environ.get("OCTREE", "9")); m.scale = 0.99
+    m.use_remove_disconnected = True; m.threshold = 0.5
 bpy.context.view_layer.objects.active = v
 bpy.ops.object.modifier_apply(modifier="v")
 bm = bmesh.new(); bm.from_mesh(v.data); bm.verts.ensure_lookup_table()
@@ -24,6 +28,7 @@ for a in bm.verts:
             if y.index not in seen: seen.add(y.index); st.append(y)
     comps.append(comp)
 comps.sort(key=len, reverse=True)
+print("components", [len(c) for c in comps[:5]], len(comps))
 bmesh.ops.delete(bm, geom=[x for c in comps[1:] for x in c], context="VERTS")
 obj_in, obj_out = f"{S}/{name}_vox.obj", f"{S}/{name}_quad.obj"
 with open(obj_in, "w") as fh:
@@ -32,7 +37,7 @@ with open(obj_in, "w") as fh:
     for f in bm.faces: fh.write("f " + " ".join(str(x.index + 1) for x in f.verts) + "\n")
 bm.free()
 t = time.time()
-r = subprocess.run([IM, obj_in, "-o", obj_out, "-f", str(faces), "-r", "4", "-p", "4", "-S", "3", "-d", "-t", "4"],
+r = subprocess.run([IM, obj_in, "-o", obj_out, "-f", str(faces), "-r", "4", "-p", "4", "-S", "4", "-c", sys.argv[4] if len(sys.argv) > 4 else "35", "-d", "-t", "4"],
                    capture_output=True, text=True, cwd=None)
 print("instant meshes", r.returncode, time.time() - t, r.stdout[-300:], r.stderr[-300:])
 verts, fcs = [], []
