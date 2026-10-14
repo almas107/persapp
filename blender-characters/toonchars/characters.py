@@ -182,3 +182,83 @@ CHARACTERS = [
         pose="trickster",
     ),
 ]
+
+
+# ---------------------------------------------------------------------------
+# v2 (anatomical MakeHuman body + body-derived clothing)
+def _g(kind, name, color, shadow=None, **kw):
+    d = dict(kind=kind, name=name, color=srgb(color), shadow=srgb(shadow) if shadow else None)
+    d.update(kw)
+    return d
+
+
+V2 = {
+    "Rebel": dict(
+        mh=dict(gender=0.15, races={"asian": 0.5, "caucasian": 0.5}, weight=0.35, muscle=0.6),
+        face=dict(eye_w=0.016, eye_h=0.0135, eye_tilt=12, lid=0.85, lash=0.006, mouth_smile=0.25,
+                  mouth_asym=0.5, brow_tilt=0.003),
+        outfit2=dict(garments=[
+            _g("top", "tank", "#f1f0ea", "#b9b6c6", bottom=("waist", -0.02), sleeve=0.0, offset=0.004),
+            _g("top", "vest", "#202024", "#101016", bottom=("hips", -0.03), sleeve=0.18, offset=0.014, gap=0.07,
+               gap_z=0.0, flare=0.01, collar_up=True),
+            _g("bottom", "pants", "#2e4b3c", "#1a2a26", top=("waist", 0.0), length=2.0, offset=0.012, flare=0.035),
+            _g("shoes", "shoe", "#1e1e22", offset=0.009),
+        ])),
+    "Racer": dict(
+        mh=dict(gender=0.0, races={"asian": 0.6, "caucasian": 0.4}, weight=0.4, muscle=0.5),
+        face=dict(eye_w=0.0165, eye_h=0.0195, eye_tilt=3, iris=1.05, blush=0.9, mouth_open=0.22,
+                  bandage=(-0.034, -0.045, 18)),
+        outfit2=dict(garments=[
+            _g("top", "crop", "#c8262d", "#7d1f3a", bottom=("chest", -0.035), sleeve=0.0, offset=0.004),
+            _g("top", "jacket", "#1f2b4d", "#121733", bottom=("waist", -0.04), sleeve=1.97, offset=0.014,
+               gap=0.075, gap_z=0.0, flare=0.012, collar_up=True),
+            _g("bottom", "shorts", "#232327", "#121216", top=("waist", -0.05), length=0.5, offset=0.008),
+            _g("socks", "socks", "#1c1c20", offset=0.0025, **{"from": 1.3}),
+            _g("shoes", "shoe", "#2a2a30", offset=0.009),
+        ])),
+    "Collector": dict(
+        mh=dict(gender=1.0, races={"african": 1.0}, weight=0.45, muscle=0.45, mh_height=-0.3,
+                recipe={"head/head-scale-horiz-incr": 0.1}),
+        face=dict(eye_w=0.0145, eye_h=0.012, eye_tilt=1, lid=0.66, lower=0.08, lash=0.0045, mouth_smile=-0.15,
+                  blush_on=False, iris=0.95),
+        outfit2=dict(garments=[
+            _g("top", "shirt", "#f5f5f2", "#b9bccc", bottom=("hips", -0.06), sleeve=2.0, offset=0.004,
+               collar_up=True),
+            _g("top", "sweater", "#f2a9bb", "#c5768f", bottom=("hips", -0.01), sleeve=1.92, offset=0.012),
+            _g("bottom", "pants", "#1f2436", "#11141f", top=("waist", 0.0), length=2.0, offset=0.012, flare=0.01),
+            _g("shoes", "shoe", "#2c2420", offset=0.009),
+        ])),
+    "NatureSpirit": dict(
+        mh=dict(gender=0.0, races={"african": 0.6, "asian": 0.2, "caucasian": 0.2}, weight=0.45, muscle=0.45),
+        face=dict(eye_w=0.016, eye_h=0.0165, eye_tilt=4, lid=0.88, lower=0.1, mouth_smile=0.55, blush=0.55),
+        outfit2=dict(garments=[
+            _g("top", "sweater", "#2f8a52", "#1b5040", bottom=("hips", -0.05), sleeve=1.96, offset=0.014,
+               flare=0.01),
+            _g("bottom", "leggings", "#b39272", "#7f6253", top=("waist", 0.0), length=0.6, offset=0.004),
+            _g("shoes", "shoe", "#6b4a33", offset=0.007),
+        ], skirt=dict(color=srgb("#b39272"), shadow=srgb("#7f6253"), top=("waist", -0.01), length=0.62))),
+    "Scholar": dict(
+        mh=dict(gender=0.0, races={"asian": 0.8, "caucasian": 0.2}, weight=0.35, muscle=0.45),
+        face=dict(eye_w=0.0155, eye_h=0.016, eye_tilt=5, lid=0.9, mouth_smile=0.45, blush=0.3, iris=0.95),
+        outfit2=dict(garments=[
+            _g("top", "jacket", "#232328", "#121218", bottom=("hips", -0.04), sleeve=1.97, offset=0.012,
+               collar_up=True, flare=0.008),
+            _g("bottom", "pants", "#c7b08e", "#937d6f", top=("waist", 0.0), length=2.0, offset=0.012, flare=0.012),
+            _g("shoes", "shoe", "#3a2a22", offset=0.009),
+        ])),
+    "Trickster": dict(
+        mh=dict(gender=1.0, races={"asian": 0.5, "caucasian": 0.5}, weight=0.3, muscle=0.45),
+        face=dict(eye_w=0.0155, eye_h=0.0145, eye_tilt=2, lid=0.58, lower=0.12, eye_bags=True, mouth_smile=0.1,
+                  blush_on=False, iris=0.9,
+                  freckles=[(sx * x, z) for sx in (1, -1) for (x, z) in
+                            ((0.024, -0.04), (0.03, -0.045), (0.036, -0.04), (0.028, -0.05), (0.04, -0.048))]),
+        outfit2=dict(garments=[
+            _g("top", "tee", "#3b3b3d", "#232329", bottom=("hips", -0.03), sleeve=0.45, offset=0.005),
+            _g("top", "jacket", "#c9302c", "#7d1d2c", bottom=("hips", -0.07), sleeve=1.93, offset=0.02, gap=0.06,
+               gap_z=0.0, flare=0.02, collar_up=True),
+            _g("bottom", "jeans", "#93aac6", "#5d6c94", top=("waist", 0.0), length=2.0, offset=0.014, flare=0.02),
+            _g("shoes", "shoe", "#e6e2da", offset=0.01),
+        ])),
+}
+for _c in CHARACTERS:
+    _c.update(V2[_c["name"]])

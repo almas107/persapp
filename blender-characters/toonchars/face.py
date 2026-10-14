@@ -204,8 +204,8 @@ def build_face_geo(F, S):
             z = lerp(closed_curve(e), open_top, max(0.0, min(1.2, es["lid"])))
             if es["lid"] > 1.0:
                 z = top_b(e) * (1 + (es["lid"] - 1.0) * 0.4)
-            z -= es["angry"] * h * 0.55 * inner * min(1.0, es["lid"] + 0.2) * (1 - x * x) ** 0.3
-            z -= es["sad"] * h * 0.45 * (1 - inner) * (1 - x * x) ** 0.3
+            z -= es["angry"] * h * 0.55 * inner * min(1.0, es["lid"] + 0.2) * max(0.0, 1 - x * x) ** 0.3
+            z -= es["sad"] * h * 0.45 * (1 - inner) * max(0.0, 1 - x * x) ** 0.3
             return z
 
         def lower_edge(e):
@@ -306,7 +306,7 @@ def build_face_geo(F, S):
         for e in bcols:
             x = (e / w + 0.95) / 2.05      # 0 inner -> 1 outer
             z = bz + F.get("brow_arch", 0.005) * (1 - (2 * x - 1) ** 2)
-            z += es["brow_in"] * 0.009 * (1 - x) ** 1.5
+            z += es["brow_in"] * 0.009 * max(0.0, 1 - x) ** 1.5
             z -= max(0.0, es["brow_in"]) * 0.002 * x
             z += F.get("brow_tilt", 0.0) * (x - 0.5)
             th = bt * (1.0 - 0.65 * x)
@@ -340,10 +340,10 @@ def build_face_geo(F, S):
         return 0.0045 * m["smile"] * u * u + 0.0055 * lift
 
     def upper(u):
-        return mz + corner(u) + 0.12 * oh * (1 - u * u) + 0.0011 * (1 - u * u) ** 0.5
+        return mz + corner(u) + 0.12 * oh * (1 - u * u) + 0.0011 * max(0.0, 1 - u * u) ** 0.5
 
     def lower(u):
-        k = (1 - u * u)
+        k = max(0.0, 1 - u * u)
         return mz + corner(u) - oh * k ** (0.7 - 0.3 * m["round"]) - 0.0011 * k ** 0.5
 
     us = [lerp(-1, 1, i / (cols - 1)) for i in range(cols)]
@@ -355,13 +355,13 @@ def build_face_geo(F, S):
     # teeth: top strip inside the opening
     tw = 0.8
     trow_a = [(u * mw * tw, upper(u * tw) - 0.0006) for u in us]
-    trow_b = [(u * mw * tw, upper(u * tw) - 0.0006 - min(oh * 0.45, 0.0045) * m["teeth"] * (1 - u * u) ** 0.3
+    trow_b = [(u * mw * tw, upper(u * tw) - 0.0006 - min(oh * 0.45, 0.0045) * m["teeth"] * max(0.0, 1 - u * u) ** 0.3
                - 1e-5) for u in us]
     g.strip(trow_b, trow_a, "teeth", L_TEETH)
     # tongue: bottom blob
     tg = 0.62
     tr_a = [(u * mw * tg, lower(u * tg) + 0.0004) for u in us]
-    tr_b = [(u * mw * tg, lower(u * tg) + 0.0004 + oh * 0.32 * (1 - u * u) ** 0.6 + 1e-5) for u in us]
+    tr_b = [(u * mw * tg, lower(u * tg) + 0.0004 + oh * 0.32 * max(0.0, 1 - u * u) ** 0.6 + 1e-5) for u in us]
     g.strip(tr_a, tr_b, "tongue", L_TONGUE)
 
     # ---------------- nose (small shadow wedge)
